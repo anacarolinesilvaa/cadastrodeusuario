@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Cadastro com JSON</title>
+  <style>
+    table, th, td { border: 1px solid black; border-collapse: collapse; padding: 6px; }
+  </style>
+</head>
+<body>
+
+  <h2>Cadastro de Usuário</h2>
+  <form id="formUsuario">
+    <input name="nome" placeholder="Nome" required>
+    <input name="nome_do_brinquedo" placeholder="Nome do Brinquedo" required>
+    <input name="tempo" placeholder="Tempo" required>
+    <input name="data" placeholder="Data" required>
+    <input name="hora" placeholder="Hora" required>
+    <input name="avaliacao_de_0_a_5" placeholder="Avaliação de 0 à 5" required>
+    <button type="submit">Salvar</button>
+  </form>
+
+  <hr>
+
+  <h3>Usuários Cadastrados</h3>
+  <table>
+    <thead>
+      <tr><th>Nome</th><th>Nome do Brinquedo</th><th>Tempo</th><th>Data</th><th>Hora</th><th>Avaliação</th>
+    </thead>
+    <tbody id="tabelaUsuarios"></tbody>
+  </table>
+
+  <script>
+    const form = document.getElementById("formUsuario");
+    const tabela = document.getElementById("tabelaUsuarios");
+
+    // Salva no localStorage
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const dados = new FormData(form);
+      const usuario = Object.fromEntries(dados);
+      
+      // Recupera usuários já salvos
+      const usuarios = JSON.parse(localStorage.getItem("usuarios") || "[]");
+      usuarios.push(usuario);
+
+      // Salva novamente
+      localStorage.setItem("usuarios", JSON.stringify(usuarios));
+      form.reset();
+      carregarTabela();
+    });
+
+    // Função que simula fetch usando localStorage
+    function carregarTabela() {
+      fetch("dados.json") // NÃO existe, mas vamos interceptar abaixo
+        .then(() => {
+          // Simulação: lê diretamente do localStorage
+          const dados = JSON.parse(localStorage.getItem("usuarios") || "[]");
+          return Promise.resolve(dados);
+        })
+        .then(usuarios => {
+          tabela.innerHTML = "";
+          usuarios.forEach(u => {
+            tabela.innerHTML += `<tr><td>${u.nome}</td><td>${u.nome_do_brinquedo}</td><td>${u.tempo}</td><td>${u.data}</td><td>${u.hora}</td><td>${u.avaliacao_de_0_a_5}</td></tr>`;
+          });
+        });
+    }
+
+    // Carrega ao abrir a página
+    carregarTabela();
+  </script>
+</body>
+</html>
